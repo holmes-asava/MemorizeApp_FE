@@ -1,6 +1,6 @@
 import React, { useContext, useReducer, useState, useRef } from "react";
-import { MEMO_URL, MemoContext, ADD_MEMO } from "./App";
-import { makeApiRequest } from "./ToDoCard";
+import { MEMO_URL } from "../App";
+import { makeApiRequest } from "../api";
 const CreateForm = () => {
   const [title, setTitle] = useState("");
 
@@ -8,12 +8,12 @@ const CreateForm = () => {
     const url = MEMO_URL;
     return await makeApiRequest(url, "POST", data);
   };
-  const { memoState, dispatchMemo } = useContext(MemoContext);
+  // const { memoState, dispatchMemo } = useContext(MemoContext);
   const onCreate = (title) => {};
   const handleSubmit = async (event) => {
     event.preventDefault();
     const updatedItems = await addNewMemoItem({ name: title });
-    dispatchMemo({ type: ADD_MEMO, payload: updatedItems });
+    // dispatchMemo({ type: ADD_MEMO, payload: updatedItems });
     setTitle("");
   };
 

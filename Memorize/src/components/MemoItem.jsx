@@ -2,14 +2,10 @@ import React, { useContext, useReducer, useState, useRef } from "react";
 import { TiDelete } from "react-icons/ti";
 import { MdCleaningServices } from "react-icons/md";
 import { RiDeleteBin2Fill } from "react-icons/ri";
-import { MEMO_URL, MemoContext } from "./App";
-import {
-  BASED_URL,
-  UPDATE_MEMO_ITEMS,
-  MEMO_ITEM_URL,
-  DELETE_MEMO_ITEM,
-  DELETE_MEMO,
-} from "./App";
+import { MEMO_URL } from "../App";
+import { getAllTodosFn, deleteTodoitem } from "../api";
+
+import { useQuery, useMutation } from "react-query";
 const makeApiRequest = async (url, method, data) => {
   try {
     const requestOptions = {
@@ -37,12 +33,13 @@ const makeApiRequest = async (url, method, data) => {
     // Handle the error
   }
 };
-const ToDoCard = (props) => {
+const MemoItem = (props) => {
   const dragRefId = useRef(null);
   const dragOverRef = useRef(null);
 
   const [inputValue, setInputValue] = useState("");
-  const { memoState, dispatchMemo } = useContext(MemoContext);
+  // const { memoState, dispatchMemo } = useContext(MemoContext);
+
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
   };
@@ -69,10 +66,10 @@ const ToDoCard = (props) => {
     return await makeApiRequest(url, "DELETE");
   };
   const handleMemoUpdate = (updatedItems) => {
-    dispatchMemo({
-      type: UPDATE_MEMO_ITEMS,
-      payload: { memo_id: props.memo.id, updated_items: updatedItems },
-    });
+    // dispatchMemo({
+    //   type: UPDATE_MEMO_ITEMS,
+    //   payload: { memo_id: props.memo.id, updated_items: updatedItems },
+    // });
   };
 
   const sortAndUpdateMemoItem = async (event) => {
@@ -82,18 +79,22 @@ const ToDoCard = (props) => {
   };
   const handleDeleteMemo = async () => {
     const updatedItems = await deleteMemo();
-    dispatchMemo({
-      type: DELETE_MEMO,
-      payload: { memo_id: props.memo.id },
-    });
+    // dispatchMemo({
+    //   type: DELETE_MEMO,
+    //   payload: { memo_id: props.memo.id },
+    // });
   };
-  const deleteItem = async (memoItemId) => {
-    const updatedItems = await deleteMemoItem(memoItemId);
-    dispatchMemo({
-      type: DELETE_MEMO_ITEM,
-      payload: { memo_id: props.memo.id, memoItemId: memoItemId },
-    });
-  };
+  const deleteItem = useMutation((delete_target) => {
+    return deleteTodoitem(delete_target.id, delete_target.itemId);
+  });
+
+  // const deleteItem = async (memoItemId) => {
+  //   const updatedItems = await deleteMemoItem(memoItemId);
+  //   // dispatchMemo({
+  //   //   type: DELETE_MEMO_ITEM,
+  //   //   payload: { memo_id: props.memo.id, memoItemId: memoItemId },
+  //   // });
+  // };
   const handleAddItem = async (e) => {
     e.preventDefault();
     const data = { description: inputValue };
@@ -155,7 +156,10 @@ const ToDoCard = (props) => {
                 {item.description}
               </h1>
               <RiDeleteBin2Fill
-                onClick={() => deleteItem(item.id)}
+                onClick={() => {
+                  console.log(props.memo.id, item.id);
+                  deleteItem.mutate({ id: props.memo.id, itemId: item.id });
+                }}
                 className="text-slate-500"
               />
             </div>
@@ -176,4 +180,4 @@ const ToDoCard = (props) => {
   );
 };
 export { makeApiRequest };
-export default ToDoCard;
+export default MemoItem;
