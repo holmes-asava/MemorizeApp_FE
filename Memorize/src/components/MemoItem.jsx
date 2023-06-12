@@ -1,10 +1,9 @@
 import React, { useReducer, useState, useRef } from "react";
 import { RiDeleteBin2Fill } from "react-icons/ri";
 import {
-  getAllMemo,
-  deleteTodoitem,
-  postTodoitem,
-  updateTodoitem,
+  deleteMemoItem,
+  postMemoItem,
+  updateMemoItem,
   deleteMemo,
 } from "../api";
 import { useQueryClient } from "react-query";
@@ -29,7 +28,7 @@ const MemoItem = (props) => {
   const useSortAndUpdateMemoItem = useMutation(
     async (info) => {
       const data = { order: info.dragOverRef };
-      return updateTodoitem(info.id, info.itemId, data);
+      return updateMemoItem(info.id, info.itemId, data);
     },
     {
       onSuccess: async () => {
@@ -39,7 +38,7 @@ const MemoItem = (props) => {
   );
   const useDeleteMemoItem = useMutation(
     async (info) => {
-      return deleteTodoitem(info.id, info.itemId);
+      return deleteMemoItem(info.id, info.itemId);
     },
     {
       onSuccess: async () => {
@@ -50,7 +49,7 @@ const MemoItem = (props) => {
   const useAddMemoItem = useMutation(
     async (info) => {
       const data = { description: info.inputValue };
-      return postTodoitem(info.id, data);
+      return postMemoItem(info.id, data);
     },
     {
       onSuccess: async () => {
@@ -62,7 +61,7 @@ const MemoItem = (props) => {
   const useSetCompletedStatus = useMutation(
     async (info) => {
       const data = { is_completed: !info.itemIsCompleted };
-      return updateTodoitem(info.id, info.itemId, data);
+      return updateMemoItem(info.id, info.itemId, data);
     },
     {
       onSuccess: async () => {

@@ -23,15 +23,15 @@ export const deleteMemo = async (id) => {
   return res;
 };
 
-export const postTodoitem = async (id, data) => {
+export const postMemoItem = async (id, data) => {
   const res = await API.post(`memo/${id}/item/`, data);
   return res;
 };
-export const updateTodoitem = async (id, item_id, data) => {
+export const updateMemoItem = async (id, item_id, data) => {
   const res = await API.patch(`memo/${id}/item/${item_id}/`, data);
   return res;
 };
-export const deleteTodoitem = async (id, item_id) => {
+export const deleteMemoItem = async (id, item_id) => {
   const res = await API.delete(`memo/${id}/item/${item_id}/`);
   return res;
 };
