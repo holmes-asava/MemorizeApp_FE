@@ -1,17 +1,10 @@
 import { useEffect, useReducer, createContext } from "react";
-import CreateForm from "./components/creatingMemoComponent";
+import CreateMemoBox from "./components/createMemoBox";
 import { RiStickyNoteFill } from "react-icons/ri";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
-import { getAllTodosFn } from "./api";
+import { getAllMemo } from "./api";
 import MemoList from "./components/MemoList";
 
-const BASED_URL = "http://localhost:8000/";
-const MEMO_URL = BASED_URL + "memo/";
-let MEMO_ITEM_URL = (memo_id, item_id) => {
-  return item_id
-    ? BASED_URL + "memo/" + memo_id + "/item/" + item_id + "/"
-    : BASED_URL + "memo/" + memo_id + "/item/";
-};
 const queryClient = new QueryClient();
 
 function App() {
@@ -24,15 +17,15 @@ function App() {
           </h1>
           <RiStickyNoteFill />
         </li>
-        <div className=" flex  flex-wrap justify-center g-2 font-sans"></div>
-        <MemoList />
-        <div className=" flex  flex-wrap justify-center g-2 font-sans"></div>
-        <div>
-          <CreateForm />
+        <div className=" flex  flex-wrap justify-center  g-2 font-sans">
+          <MemoList />
+        </div>
+
+        <div className=" g-2 font-sans">
+          <CreateMemoBox />
         </div>
       </div>
     </QueryClientProvider>
   );
 }
-export { MEMO_URL, BASED_URL, MEMO_ITEM_URL };
 export default App;

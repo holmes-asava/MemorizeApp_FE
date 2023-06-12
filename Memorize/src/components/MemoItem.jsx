@@ -2,40 +2,20 @@ import React, { useContext, useReducer, useState, useRef } from "react";
 import { TiDelete } from "react-icons/ti";
 import { MdCleaningServices } from "react-icons/md";
 import { RiDeleteBin2Fill } from "react-icons/ri";
-import { MEMO_URL } from "../App";
-import { getAllTodosFn, deleteTodoitem } from "../api";
-
+import {
+  getAllMemo,
+  deleteTodoitem,
+  postTodoitem,
+  updateTodoitem,
+  deleteMemo,
+} from "../api";
+import { useQueryClient } from "react-query";
 import { useQuery, useMutation } from "react-query";
-const makeApiRequest = async (url, method, data) => {
-  try {
-    const requestOptions = {
-      method: method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-    if (data) {
-      requestOptions.body = JSON.stringify(data);
-    }
-    const response = await fetch(url, requestOptions);
-    if (response.ok) {
-      if (method === "DELETE") {
-        console.log("?");
-        return;
-      }
 
-      return await response.json();
-    } else {
-      throw new Error("Request failed");
-    }
-  } catch (error) {
-    console.error(error);
-    // Handle the error
-  }
-};
 const MemoItem = (props) => {
   const dragRefId = useRef(null);
   const dragOverRef = useRef(null);
+  const queryClient = useQueryClient();
 
   const [inputValue, setInputValue] = useState("");
   // const { memoState, dispatchMemo } = useContext(MemoContext);
@@ -43,65 +23,60 @@ const MemoItem = (props) => {
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
   };
+  const handleDeleteMemo = useMutation(
+    async () => {
+      return deleteMemo(props.memo.id);
+    },
+    {
+      onSuccess: async () => {
+        queryClient.invalidateQueries("memo-state");
+      },
+    }
+  );
+  const sortAndUpdateMemoItem = useMutation(
+    async (item) => {
+      const data = { order: dragOverRef.current };
+      return updateTodoitem(props.memo.id, item.id, data);
+    },
+    {
+      onSuccess: async () => {
+        queryClient.invalidateQueries("memo-state");
+      },
+    }
+  );
+  const deleteItem = useMutation(
+    async (delete_target) => {
+      return deleteTodoitem(delete_target.id, delete_target.itemId);
+    },
+    {
+      onSuccess: async () => {
+        queryClient.invalidateQueries("memo-state");
+      },
+    }
+  );
+  const addItem = useMutation(
+    async (id) => {
+      const data = { description: inputValue };
+      return postTodoitem(id, data);
+    },
+    {
+      onSuccess: async () => {
+        queryClient.invalidateQueries("memo-state");
+      },
+    }
+  );
 
-  const updateMemoItemsStatus = async (target_id, data) => {
-    const url = MEMO_ITEM_URL(props.memo.id, target_id);
-    return await makeApiRequest(url, "PATCH", data);
-  };
-  const updateMemoItems = async (data) => {
-    const url = MEMO_ITEM_URL(props.memo.id, dragRefId.current);
-    return await makeApiRequest(url, "PATCH", data);
-  };
-
-  const addNewMemoItem = async (data) => {
-    const url = MEMO_ITEM_URL(props.memo.id);
-    return await makeApiRequest(url, "POST", data);
-  };
-  const deleteMemo = async () => {
-    const url = MEMO_URL + props.memo.id + "/";
-    return await makeApiRequest(url, "DELETE");
-  };
-  const deleteMemoItem = async (target_id) => {
-    const url = MEMO_ITEM_URL(props.memo.id, target_id);
-    return await makeApiRequest(url, "DELETE");
-  };
-  const handleMemoUpdate = (updatedItems) => {
-    // dispatchMemo({
-    //   type: UPDATE_MEMO_ITEMS,
-    //   payload: { memo_id: props.memo.id, updated_items: updatedItems },
-    // });
-  };
-
-  const sortAndUpdateMemoItem = async (event) => {
-    const data = { order: dragOverRef.current };
-    const updatedItems = await updateMemoItems(data);
-    handleMemoUpdate(updatedItems);
-  };
-  const handleDeleteMemo = async () => {
-    const updatedItems = await deleteMemo();
-    // dispatchMemo({
-    //   type: DELETE_MEMO,
-    //   payload: { memo_id: props.memo.id },
-    // });
-  };
-  const deleteItem = useMutation((delete_target) => {
-    return deleteTodoitem(delete_target.id, delete_target.itemId);
-  });
-
-  // const deleteItem = async (memoItemId) => {
-  //   const updatedItems = await deleteMemoItem(memoItemId);
-  //   // dispatchMemo({
-  //   //   type: DELETE_MEMO_ITEM,
-  //   //   payload: { memo_id: props.memo.id, memoItemId: memoItemId },
-  //   // });
-  // };
-  const handleAddItem = async (e) => {
-    e.preventDefault();
-    const data = { description: inputValue };
-    const updatedItems = await addNewMemoItem(data);
-    handleMemoUpdate(updatedItems);
-    setInputValue("");
-  };
+  const setCompletedStatus = useMutation(
+    async (item) => {
+      const data = { is_completed: !item.is_completed };
+      return updateTodoitem(props.memo.id, item.id, data);
+    },
+    {
+      onSuccess: async () => {
+        queryClient.invalidateQueries("memo-state");
+      },
+    }
+  );
   const handleCompletedStatus = async (memoItem) => {
     const data = { is_completed: !memoItem.is_completed };
     const updatedItems = await updateMemoItemsStatus(memoItem.id, data);
@@ -111,19 +86,25 @@ const MemoItem = (props) => {
     <div className=" m-5 w-3/6 max-w-sm  h-fit bg-white  rounded-3xl drop-shadow-sm">
       <div
         className=" sh
-        rounded-t-3xl  p-5 text-left
-        bg-slate-100"
+        rounded-t-3xl  p-5 text-left         bg-slate-100 inline-flex w-full justify-between items-baseline "
       >
-        <h1 className="ml-5 text-lg inline-flex items-baseline gap-3">
-          {props.memo.name}
-          <TiDelete onClick={() => handleDeleteMemo(props.memo.id)} />
-        </h1>
-        {props.memo.items.length > 0 ? (
-          <h2 className="ml-10 font-light italic">
-            {props.memo.items.length} tasks
-          </h2>
-        ) : null}
+        <div className=" flex flex-col">
+          <h1 className="ml-5 text-lg inline-flex items-baseline gap-3">
+            {props.memo.name}
+          </h1>
+          {props.memo.items.length > 0 ? (
+            <h2 className="ml-10 font-light italic">
+              {props.memo.items.length} tasks
+            </h2>
+          ) : null}
+        </div>
+
+        <RiDeleteBin2Fill
+          className=" text-2xl"
+          onClick={() => handleDeleteMemo.mutate()}
+        />
       </div>
+
       <div>
         <ul className=" ml-10 text-left">
           {props.memo.items.map((item, index) => (
@@ -137,7 +118,7 @@ const MemoItem = (props) => {
               onDragEnter={(e) => {
                 dragOverRef.current = index + 1;
               }}
-              onDragEnd={sortAndUpdateMemoItem}
+              onDragEnd={() => sortAndUpdateMemoItem.mutate(item)}
               onDragOver={(e) => e.preventDefault()}
             >
               <input
@@ -146,7 +127,7 @@ const MemoItem = (props) => {
                 className="w-4 h-4 bg-gray-100 border-gray-300 rounde "
                 value="adsf"
                 checked={item.is_completed}
-                onChange={() => handleCompletedStatus(item)}
+                onChange={() => setCompletedStatus.mutate(item)}
               ></input>
               <h1
                 className={` ${
@@ -157,7 +138,6 @@ const MemoItem = (props) => {
               </h1>
               <RiDeleteBin2Fill
                 onClick={() => {
-                  console.log(props.memo.id, item.id);
                   deleteItem.mutate({ id: props.memo.id, itemId: item.id });
                 }}
                 className="text-slate-500"
@@ -174,10 +154,16 @@ const MemoItem = (props) => {
           value={inputValue}
           onChange={handleInputChange}
         />
-        <button onClick={handleAddItem}>Add</button>
+        <button
+          onClick={() => {
+            addItem.mutate(props.memo.id);
+            setInputValue("");
+          }}
+        >
+          Add
+        </button>
       </div>
     </div>
   );
 };
-export { makeApiRequest };
 export default MemoItem;
