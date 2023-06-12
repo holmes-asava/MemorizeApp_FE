@@ -1,13 +1,10 @@
-import React, { useContext, useReducer, useState, useRef } from "react";
+import React, { useReducer, useState, useRef } from "react";
 import { postMemo } from "../api";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 
 const CreateMemoBox = () => {
-  const queryClient = useQueryClient();
-
   const [title, setTitle] = useState("");
 
-  const onCreate = (title) => {};
   const handleAddMemo = useMutation(
     async (title) => {
       return postMemo({ name: title });

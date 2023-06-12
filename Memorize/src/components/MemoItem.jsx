@@ -1,6 +1,4 @@
-import React, { useContext, useReducer, useState, useRef } from "react";
-import { TiDelete } from "react-icons/ti";
-import { MdCleaningServices } from "react-icons/md";
+import React, { useReducer, useState, useRef } from "react";
 import { RiDeleteBin2Fill } from "react-icons/ri";
 import {
   getAllMemo,
@@ -17,71 +15,68 @@ const MemoItem = (props) => {
   const dragOverRef = useRef(null);
   const queryClient = useQueryClient();
 
+  const useDeleteMemo = useMutation(
+    async (info) => {
+      return deleteMemo(info.id);
+    },
+    {
+      onSuccess: async () => {
+        queryClient.invalidateQueries("memo-state");
+      },
+    }
+  );
+
+  const useSortAndUpdateMemoItem = useMutation(
+    async (info) => {
+      const data = { order: info.dragOverRef };
+      return updateTodoitem(info.id, info.itemId, data);
+    },
+    {
+      onSuccess: async () => {
+        queryClient.invalidateQueries("memo-state");
+      },
+    }
+  );
+  const useDeleteMemoItem = useMutation(
+    async (info) => {
+      return deleteTodoitem(info.id, info.itemId);
+    },
+    {
+      onSuccess: async () => {
+        queryClient.invalidateQueries("memo-state");
+      },
+    }
+  );
+  const useAddMemoItem = useMutation(
+    async (info) => {
+      const data = { description: info.inputValue };
+      return postTodoitem(info.id, data);
+    },
+    {
+      onSuccess: async () => {
+        queryClient.invalidateQueries("memo-state");
+      },
+    }
+  );
+
+  const useSetCompletedStatus = useMutation(
+    async (info) => {
+      const data = { is_completed: !info.itemIsCompleted };
+      return updateTodoitem(info.id, info.itemId, data);
+    },
+    {
+      onSuccess: async () => {
+        queryClient.invalidateQueries("memo-state");
+      },
+    }
+  );
+
   const [inputValue, setInputValue] = useState("");
-  // const { memoState, dispatchMemo } = useContext(MemoContext);
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
   };
-  const handleDeleteMemo = useMutation(
-    async () => {
-      return deleteMemo(props.memo.id);
-    },
-    {
-      onSuccess: async () => {
-        queryClient.invalidateQueries("memo-state");
-      },
-    }
-  );
-  const sortAndUpdateMemoItem = useMutation(
-    async (item) => {
-      const data = { order: dragOverRef.current };
-      return updateTodoitem(props.memo.id, item.id, data);
-    },
-    {
-      onSuccess: async () => {
-        queryClient.invalidateQueries("memo-state");
-      },
-    }
-  );
-  const deleteItem = useMutation(
-    async (delete_target) => {
-      return deleteTodoitem(delete_target.id, delete_target.itemId);
-    },
-    {
-      onSuccess: async () => {
-        queryClient.invalidateQueries("memo-state");
-      },
-    }
-  );
-  const addItem = useMutation(
-    async (id) => {
-      const data = { description: inputValue };
-      return postTodoitem(id, data);
-    },
-    {
-      onSuccess: async () => {
-        queryClient.invalidateQueries("memo-state");
-      },
-    }
-  );
 
-  const setCompletedStatus = useMutation(
-    async (item) => {
-      const data = { is_completed: !item.is_completed };
-      return updateTodoitem(props.memo.id, item.id, data);
-    },
-    {
-      onSuccess: async () => {
-        queryClient.invalidateQueries("memo-state");
-      },
-    }
-  );
-  const handleCompletedStatus = async (memoItem) => {
-    const data = { is_completed: !memoItem.is_completed };
-    const updatedItems = await updateMemoItemsStatus(memoItem.id, data);
-    handleMemoUpdate(updatedItems);
-  };
   return (
     <div className=" m-5 w-3/6 max-w-sm  h-fit bg-white  rounded-3xl drop-shadow-sm">
       <div
@@ -101,7 +96,7 @@ const MemoItem = (props) => {
 
         <RiDeleteBin2Fill
           className=" text-2xl"
-          onClick={() => handleDeleteMemo.mutate()}
+          onClick={() => useDeleteMemo.mutate({ id: props.memo.id })}
         />
       </div>
 
@@ -118,7 +113,13 @@ const MemoItem = (props) => {
               onDragEnter={(e) => {
                 dragOverRef.current = index + 1;
               }}
-              onDragEnd={() => sortAndUpdateMemoItem.mutate(item)}
+              onDragEnd={() =>
+                useSortAndUpdateMemoItem.mutate({
+                  dragOverRef: dragOverRef.current,
+                  id: props.memo.id,
+                  itemId: dragRefId.current,
+                })
+              }
               onDragOver={(e) => e.preventDefault()}
             >
               <input
@@ -127,7 +128,13 @@ const MemoItem = (props) => {
                 className="w-4 h-4 bg-gray-100 border-gray-300 rounde "
                 value="adsf"
                 checked={item.is_completed}
-                onChange={() => setCompletedStatus.mutate(item)}
+                onChange={() =>
+                  useSetCompletedStatus.mutate({
+                    itemId: item.id,
+                    id: props.memo.id,
+                    itemIsCompleted: item.is_completed,
+                  })
+                }
               ></input>
               <h1
                 className={` ${
@@ -138,7 +145,10 @@ const MemoItem = (props) => {
               </h1>
               <RiDeleteBin2Fill
                 onClick={() => {
-                  deleteItem.mutate({ id: props.memo.id, itemId: item.id });
+                  useDeleteMemoItem.mutate({
+                    id: props.memo.id,
+                    itemId: item.id,
+                  });
                 }}
                 className="text-slate-500"
               />
@@ -156,7 +166,7 @@ const MemoItem = (props) => {
         />
         <button
           onClick={() => {
-            addItem.mutate(props.memo.id);
+            useAddMemoItem.mutate({ id: props.memo.id });
             setInputValue("");
           }}
         >
