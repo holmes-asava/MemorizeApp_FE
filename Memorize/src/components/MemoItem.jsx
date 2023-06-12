@@ -77,7 +77,7 @@ const MemoItem = (props) => {
   };
 
   return (
-    <div className=" m-5   w-80 sm:w-3/6   max-w-sm font-light   h-fit bg-white  rounded-3xl drop-shadow-sm ">
+    <div className=" mx-auto my-5 sm:m-5   w-80 sm:w-3/6   max-w-sm font-light   h-fit bg-white  rounded-3xl drop-shadow-sm ">
       <div
         className="
         rounded-t-3xl  p-5 text-left   bg-slate-100 inline-flex w-full justify-between items-center  "

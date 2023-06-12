@@ -20,7 +20,7 @@ function App() {
         <div className=" g-2 font-sans mb-5">
           <CreateMemoBox />
         </div>
-        <div className=" flex  flex-wrap justify-center  g-2 font-sans">
+        <div className=" flex flex-col sm:flex-row sm:flex-wrap justify-center  g-2 font-sans">
           <MemoList />
         </div>
       </div>
