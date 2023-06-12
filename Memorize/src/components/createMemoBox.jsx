@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "react-query";
 
 const CreateMemoBox = () => {
   const [title, setTitle] = useState("");
-
+  const queryClient = useQueryClient();
   const handleAddMemo = useMutation(
     async (title) => {
       return postMemo({ name: title });
@@ -13,16 +13,6 @@ const CreateMemoBox = () => {
       onSuccess: async () => {
         queryClient.invalidateQueries("memo-state");
         setTitle("");
-      },
-    }
-  );
-  const handleDeleteMemo = useMutation(
-    async () => {
-      return deleteMemo(props.memo.id);
-    },
-    {
-      onSuccess: async () => {
-        queryClient.invalidateQueries("memo-state");
       },
     }
   );
