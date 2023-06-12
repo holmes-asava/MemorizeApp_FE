@@ -77,17 +77,20 @@ const MemoItem = (props) => {
   };
 
   return (
-    <div className=" m-5 w-3/6 max-w-sm  h-fit bg-white  rounded-3xl drop-shadow-sm">
+    <div className=" m-5   w-80 sm:w-3/6   max-w-sm font-light   h-fit bg-white  rounded-3xl drop-shadow-sm ">
       <div
-        className=" sh
+        className="
         rounded-t-3xl  p-5 text-left   bg-slate-100 inline-flex w-full justify-between items-center  "
       >
         <div className=" flex flex-col">
-          <h1 className="ml-5 text-lg inline-flex items-baseline gap-3">
+          <h1
+            className=" text-md sm:text-2xl ml-5   font-san
+           inline-flex items-baseline gap-3"
+          >
             {props.memo.name}
           </h1>
           {props.memo.items.length > 0 ? (
-            <h2 className="ml-10 font-light italic">
+            <h2 className="ml-10  italic text-sm">
               {props.memo.items.length} tasks
             </h2>
           ) : null}
@@ -104,7 +107,7 @@ const MemoItem = (props) => {
           {props.memo.items.map((item, index) => (
             <div
               key={item.order}
-              className="ml-2  cursor-move flex align-text-bottom   items-baseline  m-3 gap-2 text-lg "
+              className="ml-2  cursor-move flex align-text-bottom   items-baseline  m-3 gap-2  text-md sm:text-lg "
               draggable
               onDragStart={(e) => {
                 dragRefId.current = item.id;
@@ -124,8 +127,7 @@ const MemoItem = (props) => {
               <input
                 type="checkbox"
                 id={item.id}
-                className="cursor-pointer w-4 h-4 bg-gray-100 border-gray-300 rounde "
-                value="adsf"
+                className="cursor-pointer w-4 h-4 bg-gray-100 border-gray-300  accent-emerald-200  "
                 checked={item.is_completed}
                 onChange={() =>
                   useSetCompletedStatus.mutate({
@@ -137,7 +139,9 @@ const MemoItem = (props) => {
               ></input>
               <h1
                 className={` ${
-                  item.is_completed ? "line-through" : "no-underline"
+                  item.is_completed
+                    ? "line-through text-gray-400"
+                    : "no-underline text-black"
                 }`}
               >
                 {item.description}
@@ -149,28 +153,33 @@ const MemoItem = (props) => {
                     itemId: item.id,
                   });
                 }}
-                className="cursor-pointer text-slate-500"
+                className="cursor-pointer text-slate-600"
               />
             </div>
           ))}
         </ul>
       </div>
-      <div className=" rounded-b-3xl  bg-gradient-to-br from-slate-200 to-emerald-300">
-        <input
-          className=" bg-transparent "
-          placeholder="create new task"
-          type="text"
-          value={inputValue}
-          onChange={handleInputChange}
-        />
-        <button
-          onClick={() => {
-            useAddMemoItem.mutate({ id: props.memo.id });
+      <div className=" rounded-b-3xl  h-10  bg-gradient-to-br from-slate-200 to-emerald-300 flex ">
+        <form
+          className=" m-auto h-5  "
+          onSubmit={(e) => {
+            e.preventDefault();
+            useAddMemoItem.mutate({
+              id: props.memo.id,
+              inputValue: inputValue,
+            });
             setInputValue("");
           }}
         >
-          Add
-        </button>
+          <input
+            className=" bg-transparent border-state-600 focus:outline-none  text-center text-black"
+            placeholder="add new task"
+            type="text"
+            value={inputValue}
+            onChange={handleInputChange}
+          />
+          <button type="submit">Add</button>
+        </form>
       </div>
     </div>
   );

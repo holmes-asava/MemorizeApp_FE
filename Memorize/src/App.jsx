@@ -10,19 +10,18 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="bg-slate-200 flex-col min-w-sm max-w-6xl m-auto items-center text-center justify-center  h-full min-h-screen">
+      <div className="bg-slate-200 flex-col max-w-6xl m-auto items-center text-center justify-center  h-full min-h-screen">
         <li className="inline-flex text-5xl gab-5 p-10 font-extrabold   text-emerald-400  ">
           <h1 className=" text-transparent bg-clip-text  bg-gradient-to-r  from-slate-600 to-emerald-500">
             MEMORIZE
           </h1>
           <RiStickyNoteFill />
         </li>
+        <div className=" g-2 font-sans mb-5">
+          <CreateMemoBox />
+        </div>
         <div className=" flex  flex-wrap justify-center  g-2 font-sans">
           <MemoList />
-        </div>
-
-        <div className=" g-2 font-sans mt-10">
-          <CreateMemoBox />
         </div>
       </div>
     </QueryClientProvider>
