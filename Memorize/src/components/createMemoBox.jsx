@@ -21,16 +21,14 @@ const CreateMemoBox = () => {
   };
 
   return (
-    <div className=" ">
-      <div className=" m-auto   w-3/6 max-w-lg  bg-white  rounded-3xl drop-shadow-sm  h-20  ">
-        <form className="" onSubmit={() => handleAddMemo.mutate(title)}>
-          <label>
-            Memo Title:
-            <input type="text" value={title} onChange={handleChange} />
-          </label>
-          <button type="submit">Create</button>
-        </form>
-      </div>
+    <div className=" m-auto   w-3/6 max-w-lg  bg-white  rounded-3xl drop-shadow-sm  h-20  ">
+      <form className="" onSubmit={() => handleAddMemo.mutate(title)}>
+        <label>
+          Memo Title:
+          <input type="text" value={title} onChange={handleChange} />
+        </label>
+        <button type="submit">Create</button>
+      </form>
     </div>
   );
 };

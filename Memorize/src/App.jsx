@@ -21,7 +21,7 @@ function App() {
           <MemoList />
         </div>
 
-        <div className=" g-2 font-sans">
+        <div className=" g-2 font-sans mt-10">
           <CreateMemoBox />
         </div>
       </div>

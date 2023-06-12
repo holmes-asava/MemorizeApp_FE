@@ -80,7 +80,7 @@ const MemoItem = (props) => {
     <div className=" m-5 w-3/6 max-w-sm  h-fit bg-white  rounded-3xl drop-shadow-sm">
       <div
         className=" sh
-        rounded-t-3xl  p-5 text-left         bg-slate-100 inline-flex w-full justify-between items-baseline "
+        rounded-t-3xl  p-5 text-left   bg-slate-100 inline-flex w-full justify-between items-center  "
       >
         <div className=" flex flex-col">
           <h1 className="ml-5 text-lg inline-flex items-baseline gap-3">
@@ -94,7 +94,7 @@ const MemoItem = (props) => {
         </div>
 
         <RiDeleteBin2Fill
-          className=" text-2xl"
+          className=" text-2xl mr-5 cursor-pointer"
           onClick={() => useDeleteMemo.mutate({ id: props.memo.id })}
         />
       </div>
@@ -104,7 +104,7 @@ const MemoItem = (props) => {
           {props.memo.items.map((item, index) => (
             <div
               key={item.order}
-              className="ml-2  flex align-text-bottom   items-baseline  m-3 gap-2 text-lg "
+              className="ml-2  cursor-move flex align-text-bottom   items-baseline  m-3 gap-2 text-lg "
               draggable
               onDragStart={(e) => {
                 dragRefId.current = item.id;
@@ -124,7 +124,7 @@ const MemoItem = (props) => {
               <input
                 type="checkbox"
                 id={item.id}
-                className="w-4 h-4 bg-gray-100 border-gray-300 rounde "
+                className="cursor-pointer w-4 h-4 bg-gray-100 border-gray-300 rounde "
                 value="adsf"
                 checked={item.is_completed}
                 onChange={() =>
@@ -149,7 +149,7 @@ const MemoItem = (props) => {
                     itemId: item.id,
                   });
                 }}
-                className="text-slate-500"
+                className="cursor-pointer text-slate-500"
               />
             </div>
           ))}
