@@ -89,11 +89,9 @@ const MemoItem = (props) => {
           >
             {props.memo.name}
           </h1>
-          {props.memo.items.length > 0 ? (
-            <h2 className="ml-10  italic text-sm">
-              {props.memo.items.length} tasks
-            </h2>
-          ) : null}
+          <h2 className="ml-10  italic text-sm">
+            {props.memo.items.length} tasks
+          </h2>
         </div>
 
         <RiDeleteBin2Fill
